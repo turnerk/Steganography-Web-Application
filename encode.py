@@ -54,6 +54,7 @@ def get_next_x_bits(bit_array, bits):
 message = "This is a test message.  A secret secret secret secret secret secret secret message.  Secretly.hkhdkhdgkashkhagk;hfdka;hgiera;nsdgk;adkhagjr;hiowehfadjhgbfajlhugireanvbsjkdsfathdlauramobleyhduihsdkjahguriealgugdfhuafilhjvzhbvubfiudhsfgriuqehvnuifkhdguriladhcnulkdxhfidlakshguriekdhbvnujgfbvb  aukfhuielqa huah h48ty89i4e hnudklhgnbfjaldbgukaghuithklfhdhigdhkjjk hgirhjgkahjkghuiralbnurialgbnujkhbgnrljhfrahagjjkdassuekfdknfi hehfkahuiaehgnhgnuirlhikjdhniek,dxzhioknfdiuxhkjnmfduihxjkguihszdxfghjikjkofadjhioshpgrioahiovfdhxckjgh8opaeihivhuierph opghuiphdaioklguirelkdcjmvjakehdgioherdnkj hg8oarephziofhieadhiugjverd joahrgkhnfjkneram8pdoxhgj84oiekdxhngva9e8iorlxeht8jo34wilshfnkjaerjdox8pf ;lgejrodicl gvpui;dhgjmv[o;xzh t8ogi[aelkdhxgnivodskxhgjkal;ngkdhsio'gieaszxfhioewahgireashfheiowadhgifoahjeriohigrhaezxigh4ioshb9eojahireab478iueugilgi5bj;giybht34wy89ary8]]a"
 password = "My secret password"
 
+
 #encode message to a bit array
 encoded_message = message.encode()
 ba = bitarray()
@@ -65,6 +66,7 @@ ba.frombytes(encoded_message)
 
 # open the image to read from
 image_path = "pup.png"
+
 img = Image.open(image_path)
 
 # loads image
@@ -117,7 +119,6 @@ while True:
         j+=1
         if j == y:
             j=0
-
 
 # saves the encoded image
 img.save("test1.png")

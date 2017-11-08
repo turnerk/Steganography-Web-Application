@@ -4,7 +4,8 @@ X_BITS = 2
 COLOR = 'blue'
 
 # open the image to read from
-image_path = "red.png"#"test1.png"
+image_path = "test1.png"
+
 img = Image.open(image_path)
 
 # message_string will contain the final message
