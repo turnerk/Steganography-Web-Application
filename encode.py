@@ -1,9 +1,12 @@
 from bitarray import bitarray
 from PIL import Image
 import math
+import wave
+import sys
 
 X_BITS = 8
 COLOR = 'blue'
+FILE_TYPE = 'wav'
 
 # given a password and the size of the image, a "random" place in the image to start encoding is returned
 def start_location(password, x, y):
@@ -64,61 +67,108 @@ ba.frombytes(encoded_message)
 #for i in range(8):
     #ba.extend('0')
 
-# open the image to read from
-image_path = "pup.png"
+if FILE_TYPE == 'png':
+    # open the image to read from
+    image_path = "pup.png"
 
-img = Image.open(image_path)
+    img = Image.open(image_path)
 
-# loads image
-pix = img.load()
+    # loads image
+    pix = img.load()
 
-# retreives size of the image
-(x, y) = img.size
+    # retreives size of the image
+    (x, y) = img.size
 
-# calculates the maximum size of the message
-max_message = ((8/X_BITS) * x * y)-1
-print("Your message should not exceed %d characters" % max_message)
-print("Your current message is %d characters" % len(message))
 
-# gets the location in the image to start encoding
-if password:
-    x_start, y_start = start_location(password, x, y)
-else:
-    x_start, y_start = 0,0
+    # calculates the maximum size of the message
+    max_message = ((8/X_BITS) * x * y)-1
+    print("Your message should not exceed %d characters" % max_message)
+    print("Your current message is %d characters" % len(message))
 
-j = y_start
-i = x_start
+    # gets the location in the image to start encoding
+    if password:
+        x_start, y_start = start_location(password, x, y)
+    else:
+        x_start, y_start = 0,0
 
-# loops through each pixel and modifies the COLOR bit to contain a portion of the message
-while True:
-    # gets the next x bits of the message
-    (x_bits, ba) = get_next_x_bits(ba, X_BITS)
+    j = y_start
+    i = x_start
 
-    # gets RGB value of the pixel
-    (red, green, blue) = pix[i, j]
+    # loops through each pixel and modifies the COLOR bit to contain a portion of the message
+    while True:
+        # gets the next x bits of the message
+        (x_bits, ba) = get_next_x_bits(ba, X_BITS)
 
-    # makes the last x bits the x bits from the message
-    # updates the pixel value
-    if COLOR == 'red':
-        red_aft = (red >> X_BITS << X_BITS) | x_bits
-        pix[i, j] = (red_aft, green, blue)
-    elif COLOR == 'green':
-        green_aft = (green >> X_BITS << X_BITS) | x_bits
-        pix[i, j] = (red, green_aft, blue)
-    elif COLOR == 'blue':
-        blue_aft = (blue >> X_BITS << X_BITS) | x_bits
-        pix[i, j] = (red, green, blue_aft)
+        # gets RGB value of the pixel
+        (red, green, blue) = pix[i, j]
 
-    if len(ba) == 0 and x_bits == 0:
-        break
+        # makes the last x bits the x bits from the message
+        # updates the pixel value
+        if COLOR == 'red':
+            red_aft = (red >> X_BITS << X_BITS) | x_bits
+            pix[i, j] = (red_aft, green, blue)
+        elif COLOR == 'green':
+            green_aft = (green >> X_BITS << X_BITS) | x_bits
+            pix[i, j] = (red, green_aft, blue)
+        elif COLOR == 'blue':
+            blue_aft = (blue >> X_BITS << X_BITS) | x_bits
+            pix[i, j] = (red, green, blue_aft)
 
-    # increments the column, if at the end of the column goes back to 0 and increments the row.  If at the end of columns and rows goes back to the beginning
-    i+=1
-    if i == x:
-        i = 0
-        j+=1
-        if j == y:
-            j=0
+        if len(ba) == 0 and x_bits == 0:
+            break
 
-# saves the encoded image
-img.save("test1.png")
+        # increments the column, if at the end of the column goes back to 0 and increments the row.  If at the end of columns and rows goes back to the beginning
+        i+=1
+        if i == x:
+            i = 0
+            j+=1
+            if j == y:
+                j=0
+
+    # saves the encoded image
+    img.save("test1.png")
+
+elif FILE_TYPE == 'wav':
+    # open the wav file to read from
+    wav_path = 'a2002011001-e02.wav'
+    with wave.open(wav_path, 'rb') as wav, wave.open('test1.wav', 'wb') as encoded_wav:
+
+        #TODO: check the bit depth and number of channels
+        sample_width = wav.getsampwidth()
+
+        # set the same settings for the destination test1.wav file
+        encoded_wav.setparams(wav.getparams())
+
+        #print (wav.getnframes())
+        #sys.exit()
+
+        # loops through each frame and modifies the last byte to contain a portion of the message
+        for i in range(0,10):
+            # read a single frame
+            frame = wav.readframes(1)
+            
+            # get the last byte in each frame
+            frame_byte = frame[-1:]
+            #print (str(frame_byte))
+
+
+            (x_bits, ba) = get_next_x_bits(ba, X_BITS)
+            # if there is nothing left to encode, just write the rest of the frames to the output file
+            if len(ba) == 0 and x_bits == 0:
+                encoded_wav.writeframes(frame)
+            else:
+                #encode the message in the last byte of each frame
+                frame_int = int.from_bytes(frame_byte, 'big')
+                frame_aft = (frame_int >> X_BITS << X_BITS) | x_bits
+                frame_aft = frame_aft.to_bytes(1, 'big')
+
+                # write the frame and avoid changing the total number of frames
+                # this part is only writing the last modified byte, not the whole frame...
+                encoded_wav.writeframes(frame_aft)
+
+                '''
+                print ('--------------------------------------------------------------')
+                print (frame_byte)
+                print ('\n')
+                print (frame_aft)
+                '''
