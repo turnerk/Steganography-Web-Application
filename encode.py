@@ -2,8 +2,8 @@ from bitarray import bitarray
 from PIL import Image
 import math
 
-X_BITS = 8
-COLOR = 'blue'
+X_BITS = 2
+COLOR = 'red'
 
 # given a password and the size of the image, a "random" place in the image to start encoding is returned
 def start_location(password, x, y):
@@ -52,7 +52,8 @@ def get_next_x_bits(bit_array, bits):
     return (i, bit_array)
 
 message = "This is a test message.  A secret secret secret secret secret secret secret message.  Secretly.hkhdkhdgkashkhagk;hfdka;hgiera;nsdgk;adkhagjr;hiowehfadjhgbfajlhugireanvbsjkdsfathdlauramobleyhduihsdkjahguriealgugdfhuafilhjvzhbvubfiudhsfgriuqehvnuifkhdguriladhcnulkdxhfidlakshguriekdhbvnujgfbvb  aukfhuielqa huah h48ty89i4e hnudklhgnbfjaldbgukaghuithklfhdhigdhkjjk hgirhjgkahjkghuiralbnurialgbnujkhbgnrljhfrahagjjkdassuekfdknfi hehfkahuiaehgnhgnuirlhikjdhniek,dxzhioknfdiuxhkjnmfduihxjkguihszdxfghjikjkofadjhioshpgrioahiovfdhxckjgh8opaeihivhuierph opghuiphdaioklguirelkdcjmvjakehdgioherdnkj hg8oarephziofhieadhiugjverd joahrgkhnfjkneram8pdoxhgj84oiekdxhngva9e8iorlxeht8jo34wilshfnkjaerjdox8pf ;lgejrodicl gvpui;dhgjmv[o;xzh t8ogi[aelkdhxgnivodskxhgjkal;ngkdhsio'gieaszxfhioewahgireashfheiowadhgifoahjeriohigrhaezxigh4ioshb9eojahireab478iueugilgi5bj;giybht34wy89ary8]]a"
-password = "My secret password"
+#password = "My secret password"
+password = None
 
 #encode message to a bit array
 encoded_message = message.encode()
@@ -64,17 +65,23 @@ ba.frombytes(encoded_message)
     #ba.extend('0')
 
 # open the image to read from
-image_path = "pup.png"
+image_path = "Stegosaurus.png"
 img = Image.open(image_path)
+
+if len(img.getbands())==3:
+    channels='RGB'
+elif len(img.getbands())==4:
+    channels='RGBA'
 
 # loads image
 pix = img.load()
 
 # retreives size of the image
 (x, y) = img.size
+print(x, y)
 
 # calculates the maximum size of the message
-max_message = ((8/X_BITS) * x * y)-1
+max_message = ((x * y)/(8/X_BITS))-1
 print("Your message should not exceed %d characters" % max_message)
 print("Your current message is %d characters" % len(message))
 
@@ -92,8 +99,12 @@ while True:
     # gets the next x bits of the message
     (x_bits, ba) = get_next_x_bits(ba, X_BITS)
 
-    # gets RGB value of the pixel
-    (red, green, blue) = pix[i, j]
+    if channels=='RGBA':
+        # gets RGBA value of the pixel
+        (red, green, blue, alpha) = pix[i, j]
+    elif channels=='RGB':
+        # gets RGB value of the pixel
+        (red, green, blue) = pix[i, j]
 
     # makes the last x bits the x bits from the message
     # updates the pixel value

@@ -1,10 +1,10 @@
 from PIL import Image
 
 X_BITS = 2
-COLOR = 'blue'
+COLOR = 'red'
 
 # open the image to read from
-image_path = "red.png"#"test1.png"
+image_path = "test1.png"#"test1.png"
 img = Image.open(image_path)
 
 # message_string will contain the final message
@@ -12,6 +12,11 @@ message_string = ""
 
 # loads image
 pix = img.load()
+
+if len(img.getbands())==3:
+    channels='RGB'
+elif len(img.getbands())==4:
+    channels='RGBA'
 
 # retreives the size of the image and loops through each pixel of the image
 (x, y) = img.size
@@ -26,8 +31,12 @@ orig_j = j
 # loops through each pixel until a NULL character is found
 eom_found = False
 while True:
-    # get RGB values for each pixel
-    (red, green, blue) = pix[i,j]
+    if channels=='RGBA':
+        # gets RGBA value of the pixel
+        (red, green, blue, alpha) = pix[i, j]
+    elif channels=='RGB':
+        # gets RGB value of the pixel
+        (red, green, blue) = pix[i, j]
 
     # add the last two bits of the COLOR value to char_string
     if COLOR == 'red':
