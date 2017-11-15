@@ -1,9 +1,54 @@
 from bitarray import bitarray
 from PIL import Image
-import math
+import re, math
 
 X_BITS = 2
 COLOR = 'red'
+def get_alphabet(password):
+    # formats password to be processed
+    password = password.lower()
+    password = re.sub(r'[^a-z]', '', password)
+
+    # unique_chars contains the order the cipher alphabet should go
+    unique_chars = []
+    for letter in password:
+        if letter not in unique_chars:
+            unique_chars.append(letter)
+    for letter in range(97, 123, 1):
+        if chr(letter) not in unique_chars:
+            unique_chars.append(chr(letter))
+
+    # alphabet contains the plain text to cipher text conversions
+    alphabet = {}
+    for letter in range(97, 123, 1):
+        alphabet[chr(letter)] = unique_chars[letter-97].upper()
+
+    return alphabet
+
+def monoalphabetic_encode(message, password):
+    # gets the cipher alphabet according to the password
+    alphabet = get_alphabet(password)
+
+    # ensures that the message is lower case
+    message = message.lower()
+
+    # replaces each plain text character with the corresponding cipher text character
+    cipher_message = message
+    for key, value in alphabet.items():
+        cipher_message = cipher_message.replace(key, value)
+
+    return cipher_message
+
+def caesar_shift(message, method):
+    # shift by 13 to make the text look not english
+    new_message=['']*len(message)
+    for i in range(0,len(message)):
+        if method=='encode':
+            new_message[i] = chr(ord(message[i])-13)
+        elif method=='decode':
+            new_message[i] = chr(ord(message[i])+13)
+    new_message = ''.join(new_message)
+    return new_message
 
 # given a password and the size of the image, a "random" place in the image to start encoding is returned
 def start_location(password, x, y):
@@ -35,8 +80,6 @@ def start_location(password, x, y):
     alphabetic = ''.join([c for c in sorted(unique_chars) if ord(c)>=65])
 
     column_start = (len(password) * len(unique_chars) * ord(alphabetic[0])) % y
-    print(row_start)
-    print(column_start)
     return (row_start, column_start)
 
 # takes in a bit array and returns the X left most bits and the bit array without those bits
@@ -55,14 +98,21 @@ message = "This is a test message.  A secret secret secret secret secret secret 
 #password = "My secret password"
 password = None
 
+print("ENCODED:")
+if password:
+    enciphered = monoalphabetic_encode(message, password)
+    shifted = caesar_shift(enciphered, 'encode')
+    message = shifted
+print(message)
+
 #encode message to a bit array
 encoded_message = message.encode()
 ba = bitarray()
 ba.frombytes(encoded_message)
 
 #add a null byte to indicate the end of message
-#for i in range(8):
-    #ba.extend('0')
+for i in range(8):
+    ba.extend('0')
 
 # open the image to read from
 image_path = "Stegosaurus.png"
@@ -78,7 +128,6 @@ pix = img.load()
 
 # retreives size of the image
 (x, y) = img.size
-print(x, y)
 
 # calculates the maximum size of the message
 max_message = ((x * y)/(8/X_BITS))-1

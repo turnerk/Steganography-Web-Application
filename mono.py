@@ -53,12 +53,14 @@ def monoalphabetic_decode(cipher_message, password):
 
     return plain_message
 
-def caesar_shift(message):
+def caesar_shift(message, method):
     # shift by 130 to make the text look not english
     new_message=['']*len(message)
     for i in range(0,len(message)):
-        new_message[i] = chr(ord(message[i])+130)
-
+        if method=='encode':
+            new_message[i] = chr(ord(message[i])+13)
+        elif method=='decode':
+            new_message[i] = chr(ord(message[i])-13)
     new_message = ''.join(new_message)
     return new_message
 
@@ -79,7 +81,6 @@ def start_location(password, x, y):
         middle = ord(password[math.ceil(len(password)/2)-1])
 
     row_start = (sum_of_ascii_chars * middle) % x
-    print(row_start)
 
     # COLUMN
     # finds the number of unique characters in the password
@@ -92,17 +93,20 @@ def start_location(password, x, y):
     alphabetic = ''.join([c for c in sorted(unique_chars) if ord(c)>=65])
 
     column_start = (len(password) * len(unique_chars) * ord(alphabetic[0])) % y
-    print(column_start)
 
 print("ENCODED:")
 enciphered = monoalphabetic_encode(message, password)
 print(enciphered)
+shifted = caesar_shift(enciphered, 'encode')
+print(shifted)
 print("DECODED:")
-print(monoalphabetic_decode(enciphered, password))
-print(caesar_shift(enciphered))
+unshifted = caesar_shift(shifted, 'decode')
+print(unshifted)
+deciphered = monoalphabetic_decode(unshifted, password)
+print(deciphered)
 
 # open the image to read from
-image_path = "test.png"
+image_path = "test1.png"
 img = Image.open(image_path)
 # retreives size of the image
 (x, y) = img.size
