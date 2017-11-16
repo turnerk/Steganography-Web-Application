@@ -1,0 +1,49 @@
+body {
+  padding : 10px;
+  background-color:ghostwhite;
+}
+
+/* remove border radius for the tab */
+
+#exTab1 .nav-pills > li > a {
+  border-radius: 0;
+}
+
+/* change border radius for the tab , apply corners on top*/
+
+#exTab3 .nav-pills > li > a {
+  border-radius: 4px 4px 0 0;
+}
+
+.tab-content {
+	padding : 5px 15px;
+}
+
+
+.box {
+    background-color:lightgray;
+    background-size:contain;
+    padding:0;
+    border: 20px solid ghostwhite;
+}
+
+.box_outline {
+    background-color:silver
+}
+
+.outline1 {
+    line-height: 1.7;
+}
+
+.outline2 {
+    line-height: 9.5;
+}
+
+.text_area {
+    background-color:rgba(255, 255, 255, 0.95);
+}
+
+.header {
+    box-shadow: 0 0 30px black;
+}
+
