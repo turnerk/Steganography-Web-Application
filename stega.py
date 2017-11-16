@@ -70,21 +70,26 @@ def test():
 	x, y = img.size
 	return str(x)
 
-@app.route('/encode', methods=['POST'])
+@app.route('/encode', methods=['GET', 'POST'])
 def encode():
 	message = request.form['messageToEncode']
 	COLOR = request.form['colorSelect'].lower()
 	password = ""
 	password = str(request.form['optPwd']).strip()
 	X_BITS = int(request.form['bitSlider'].strip())
+	
+	if password:
+		enciphered = monoalphabetic_encode(message, password)
+		shifted = caesar_shift(enciphered, 'encode')
+		message = shifted
 	#encode message to a bit array
 	encoded_message = message.encode()
 	ba = bitarray()
 	ba.frombytes(encoded_message)
 
 	#add a null byte to indicate the end of message
-	#for i in range(8):
-		#ba.extend('0')
+	for i in range(8):
+		ba.extend('0')
 
 	# open the image to read from
 	path = getid()
@@ -157,7 +162,18 @@ def encode():
 
 	# saves the encoded image
 	img.save("uploads/" + path + "encoded.png")
-	return redirect("uploads/" + path + "encoded.png")
+	return ('', 204)
+	#return redirect("uploads/" + path + "encoded.png")
+def caesar_shift(message, method):
+	# shift by 13 to make the text look not english
+	new_message=['']*len(message)
+	for i in range(0,len(message)):
+		if method=='encode':
+			new_message[i] = chr(ord(message[i])-13)
+		elif method=='decode':
+			new_message[i] = chr(ord(message[i])+13)
+	new_message = ''.join(new_message)
+	return new_message
 
 # given a password and the size of the image, a "random" place in the image to start encoding is returned
 def start_location(password, x, y):
@@ -288,8 +304,10 @@ def decode():
 	# char_string will hold 8 bits to be converted to a character
 	char_string=""
 
-	j = 0
-	i = 0
+	i, j = 0, 0
+	if password:
+		i, j = start_location(password, x, y)
+
 	orig_i = i
 	orig_j = j
 	# loops through each pixel until a NULL character is found
@@ -334,16 +352,18 @@ def decode():
 		if i == orig_i and j == orig_j:
 			#return 'looped through whole image'
 			break
-	if len(password) > 0:
-		message_string = str(message_string)
-		message_string = monoalphabetic_decode(message_string, password)
+
 	# print the message found in the image
 	if eom_found == True:
 		#return 'woot' + str(message_string)
+		if password:
+			unshifted = caesar_shift(message_string, 'decode')
+			message_string = monoalphabetic_decode(unshifted, password)
 		session['message_string'] = message_string
 	else:
 		session['message_string'] = 'No message found'
-	return  session['message_string']
+	return ('', 204)
+	#return  session['message_string']
 
 if __name__ == "__main__":
 	app.run(debug=True)
