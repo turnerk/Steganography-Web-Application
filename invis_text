@@ -1,0 +1,9 @@
+import sys
+url = "https://bitly.com/"
+text = sys.argv[1]
+for i in range(len(text)):
+    if text[i]==u'\uFEFF':
+        if i != len(text)-1:
+            url = url+text[i+1]
+
+print(url)
