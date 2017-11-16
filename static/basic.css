@@ -1,0 +1,73 @@
+body {
+  padding : 10px;
+  background-color:white;
+}
+
+/* remove border radius for the tab */
+
+#exTab1 .nav-pills > li > a {
+  border-radius: 0;
+}
+
+/* change border radius for the tab , apply corners on top*/
+
+#exTab3 .nav-pills > li > a {
+  border-radius: 4px 4px 0 0;
+}
+
+.tab-content {
+  width: 100%;
+  max-width: 600px;
+  min-width: 300px;
+}
+
+.box {
+    background-color:white;
+    background-size:contain;
+    padding:20px;
+    width: auto;
+    max-width: 600px;
+    min-width: 400px;
+    margin: 0px;
+    /*border: 20px solid;*/
+}
+
+.outline1 {
+    line-height: 1.7;
+}
+
+.outline2 {
+    line-height: 9.5;
+}
+
+.header {
+    box-shadow: 0 0 30px black;
+}
+
+.jumbotron {
+  padding: 5px;
+}
+
+.card {
+  height: 420px;
+  width: 100%;
+}
+
+.card-header {
+  background-color:rgb(50, 102, 98);
+}
+
+#origcanvas {
+  margin-right: 10%;
+  margin-left: 10%;
+}
+
+.test{
+  width: 100%;
+  max-width: 600px;
+  min-width: 300px;
+}
+
+#encodedText {
+  width: 100%;
+}

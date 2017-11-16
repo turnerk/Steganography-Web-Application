@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+<head Cache-Control: max-age=0, must-revalidate, no-store>
+    <META HTTP-EQUIV="Pragma" CONTENT="no-cache">
+    <META HTTP-EQUIV="Expires" CONTENT="-1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/9.9.0/css/bootstrap-slider.min.css">
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='basic.css') }}" />
+    <link rel="stylesheet" href="static/dropzone.css">
+    <link rel="stylesheet" href="static/basic.css">
+
+    <title>Steganography App</title>
+</head>
+<body class="body">
+    <div id="jumbo" class="jumbotron jumbotron-fluid">
+        <h1 class="display-3">
+            Steganography Web App
+            <img src="Stego.png" class="img-fluid" width="150px" />
+        </h1>
+        <hr class="my-2" />
+        <p class="lead">  <small> A web application for hiding messages within images and hiding images on the web.</small></p>
+    </div>
+    <div class="container-fluid">
+        <ul class="nav nav-tabs">
+            <li class="nav-item">
+                <a class="nav-link active" data-toggle="tab" href="#1">Encode/Decode Images</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" href="#2">Hide Images</a>
+            </li>
+        </ul>
+    </div>
+    <div class="container-fluid py-4">
+        <div class="row">
+            <div class="tab-pane active body" id="1">
+                <div class="col-md-6 box">
+                    <span class="anchor" id="formEncode"></span>
+                    <div class="card card-outline-secondary w3-card-4">
+                        <div class="card-header text-white">
+                            <h3 class="mb-0">Message</h3>
+                        </div>
+                        <div class="card-block">
+                            <form autocomplete="off" method="POST" action="{{ url_for('encode') }}">
+                                <div class="form-group">
+                                    <div class="row mb-1">
+                                        <div class="col-lg-12">
+                                            <textarea rows="6" name="messageToEncode" id="messageToEncode" class="form-control" required=""></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col-lg-12">
+                                        <div class="row">
+                                            <div class="col float-left">
+                                                <input type="text" class="form-control mb-3 float-left mt-2" name="optPwd" id="optPwd" placeholder="Optional Password">
+                                                <input id="bitSlider"
+                                                       name="bitSlider"
+                                                       type="text"
+                                                       value="2"
+                                                       data-provide="slider"
+                                                       data-slider-min="1"
+                                                       data-slider-max="8"
+                                                       data-slider-step="1"
+                                                       data-slider-value="2"
+                                                       data-slider-tooltip="always"> <br />
+                                                <span id="CurrentSliderVal" name="CurrentSliderVal">
+                                                    <span>&nbsp&nbsp&nbsp</span>
+                                                    <span id="bitSliderVal" name="bitSliderVal">2 </span>
+                                                    <span>Bits to Encode</span>
+                                                </span>
+                                            </div>
+                                            <div class="col float-right mt-2">
+                                                <select class="form-control" id="colorSelect" name="colorSelect">
+                                                    <option name="red">Red</option>
+                                                    <option name="green">Green</option>
+                                                    <option name="blue">Blue</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-secondary btn-lg float-left">Decode Message</button>
+                                <button type="submit" class="btn btn-secondary btn-lg float-right">Encode Message</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="test">
+                <div class="col-md-6 box">
+                    <span class="anchor" id="formImage"></span>
+                    <div class="card card-outline-secondary w3-card-4">
+                        <div class="card-header text-white">
+                            <h3 class="mb-0">Upload Image</h3>
+                        </div>
+                        <div class="card-block" >
+                            <form id="uploadForm" method="POST" enctype="multipart/form-data">
+                                <div class="form-group float-center upload-drop-zone" id="drop-zone">
+                                    <div style="height: 50px">
+                                        <input type="file" id="orig" name="file" /><br>
+                                    </div>
+                                    <canvas style="border: solid 1px silver" width="400" height="200" id="origcanvas"></canvas>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+                    <div class="tab-content">
+                        <div class="tab-pane" id="2">
+                            <div class="col-md-6 box">
+                                <span class="anchor" id="formEncode"></span>
+                                <div class="card card-outline-secondary w3-card-4">
+                                    <div class="card-header text-white">
+                                        <h3 class="mb-0">Hide or Find Image</h3>
+                                    </div>
+                                    <div class="card-block">
+                                        <form autocomplete="off" method="POST" action="{{ url_for('decode') }}">
+                                            <div class="row mb-1">
+                                              <button type="submit" class="btn btn-secondary btn-lg float-left">Hide Image</button>
+                                              <button type="submit" class="btn btn-secondary btn-lg float-right">Find Image</button>
+                                            </div>
+                                            <div class="row mb-1">
+                                                <div class="col-lg-12">
+                                                    <textarea rows="6" name="encodedText" id="encodedText" class="form-control">{{ session["encodedText"]|tojson }}</textarea>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+    </div>
+
+</body>
+<script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.11/handlebars.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.11/handlebars.runtime.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/9.9.0/bootstrap-slider.min.js"></script>
+    <script>
+
+        var path = {{ data.path_to_image|tojson }};
+        var canvas = document.getElementById('origcanvas');
+        var context = canvas.getContext('2d');
+        var imageObj = new Image();
+
+        imageObj.onload = function() {
+            context.drawImage(imageObj, 0, 0, imageObj.width, imageObj.height, 0, 0, canvas.width, canvas.height);
+        };
+        imageObj.src = path + new Date().getTime();
+        document.getElementById("orig").onchange = function() {
+        document.getElementById("uploadForm").submit();
+        };
+        $('#origcanvas').click(function(){
+            $('#orig').trigger('click');
+        });
+        function reloadDecodeMessage(){
+            var decoded = {{ session["message_string"]|tojson }};
+            document.getElementById("decodeMessage").innerHTML = {{ session["message_string"]|tojson }};
+        }
+
+    </script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+    <script src="static/imagePreview.js"></script>
+</html>
