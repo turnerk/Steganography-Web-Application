@@ -18,7 +18,6 @@ ALLOWED_EXTENSIONS = set(['txt', 'png', 'wav'])
 app = Flask(__name__)
 app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 #app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 app.add_url_rule('/uploads/<filename>', 'uploaded_file',
 				 build_only=True)
@@ -56,7 +55,12 @@ def upload_file():
 			file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 			#return redirect(url_for('uploaded_file',
 									#filename=filename))
-	return render_template('index.html')
+	path = getid()
+	image_path = str("https://stega.me/uploads/" + path + ".png?t=")
+	data = {}
+	data['path_to_image'] = str(image_path)
+
+	return render_template('index.html', data=data)
 
 @app.route('/test')
 def test():
@@ -73,21 +77,16 @@ def encode():
 	password = ""
 	password = str(request.form['optPwd']).strip()
 	X_BITS = int(request.form['bitSlider'].strip())
-
-	if len(password):
-		enciphered = monoalphabetic_encode(message, password)
-		shifted = caesar_shift(enciphered, 'encode')
-		message = shifted
-	
+	#encode message to a bit array
 	encoded_message = message.encode()
 	ba = bitarray()
 	ba.frombytes(encoded_message)
 
 	#add a null byte to indicate the end of message
-	for i in range(8):
-		ba.extend('0')
+	#for i in range(8):
+		#ba.extend('0')
 
-	#open the image to read from
+	# open the image to read from
 	path = getid()
 	image_path = str("uploads/" + path + ".png")
 
@@ -114,6 +113,7 @@ def encode():
 	#gets the location in the image to start encoding
 	if len(password) > 0:
 		x_start, y_start = start_location(password, x, y)
+		message = monoalphabetic_encode(message, password)
 	else:
 		x_start, y_start = 0,0
 
@@ -262,17 +262,6 @@ def monoalphabetic_decode(cipher_message, password):
 
 	return plain_message
 
-def caesar_shift(message, method):
-	# shift by 13 to make the text look not english
-	new_message=['']*len(message)
-	for i in range(0,len(message)):
-		if method=='encode':
-			new_message[i] = chr(ord(message[i])-13)
-		elif method=='decode':
-			new_message[i] = chr(ord(message[i])+13)
-	new_message = ''.join(new_message)
-	return new_message
-
 @app.route('/decode', methods=['GET', 'POST'])
 def decode():
 	COLOR = request.form['colorSelectDe'].lower()
@@ -299,10 +288,8 @@ def decode():
 	# char_string will hold 8 bits to be converted to a character
 	char_string=""
 
-	i, j = 0, 0
-	if password:
-		i, j = start_location(password, x, y)
-
+	j = 0
+	i = 0
 	orig_i = i
 	orig_j = j
 	# loops through each pixel until a NULL character is found
@@ -353,9 +340,6 @@ def decode():
 	# print the message found in the image
 	if eom_found == True:
 		#return 'woot' + str(message_string)
-		if password:
-			unshifted = caesar_shift(message_string, 'decode')
-			message_string = monoalphabetic_decode(unshifted, password)
 		session['message_string'] = message_string
 	else:
 		session['message_string'] = 'No message found'

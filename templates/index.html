@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html>
-<head>
+<head Cache-Control: max-age=0, must-revalidate, no-store>
     <META HTTP-EQUIV="Pragma" CONTENT="no-cache">
     <META HTTP-EQUIV="Expires" CONTENT="-1">
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
@@ -11,6 +11,7 @@
     <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='basic.css') }}" />
     <link rel="stylesheet" href="css/dropzone.css">
     <link rel="stylesheet" href="css/basic.css">
+
     <title>Steganography App</title>
 </head>
 <body class="body">
@@ -98,9 +99,9 @@
 
                                 <h3 class="mb-0">Upload Image</h3>
                             </div>
-                            <div class="card-block">
+                            <div class="card-block" >
                                 <form id="uploadForm" method="POST" enctype="multipart/form-data">
-                                    <div class="form-group float-center">
+                                    <div class="form-group float-center upload-drop-zone" id="drop-zone">
                                         <div style="height: 50px">
                                             <input type="file" id="orig" name="file" /><br>
                                         </div>
@@ -181,11 +182,12 @@
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.11/handlebars.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.11/handlebars.runtime.min.js"></script>
-<script src="https://code.jquery.com/jquery-3.2.1.min.js"
-        integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
-        crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/9.9.0/bootstrap-slider.min.js"></script>
     <script>
+
+        var path = {{ data.path_to_image|tojson }};
+
         var canvas = document.getElementById('origcanvas');
         var context = canvas.getContext('2d');
         var imageObj = new Image();
@@ -193,14 +195,14 @@
         imageObj.onload = function() {
             context.drawImage(imageObj, 0, 0, imageObj.width, imageObj.height, 0, 0, canvas.width, canvas.height);
         };
-        imageObj.src = 'https://stega.me/uploads/128146147110.png?t=' + new Date().getTime();
+        imageObj.src = path + new Date().getTime();
         document.getElementById("orig").onchange = function() {
         document.getElementById("uploadForm").submit();
         };
         $('#origcanvas').click(function(){ 
             $('#orig').trigger('click'); 
         });
-    
+
     </script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
